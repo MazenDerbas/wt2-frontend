@@ -29,7 +29,7 @@ export class EnergyDataDisplay {
         this.#searchQuery = ''
 
 
-        // Bind event listeners
+   
         this.#searchForm.addEventListener('submit', (event) => this.#fetchEnergyData(event))
         this.#sortBtn.addEventListener('click', () => this.#sortData())
     }
@@ -67,6 +67,11 @@ export class EnergyDataDisplay {
         console.log('API Response:', data)
 
         const { searchResults, currentPage, totalPages } = data
+
+        const noDataMessage = document.getElementById('no-data-message');
+        if (noDataMessage) {
+        noDataMessage.remove();
+        }
 
         // Handle no results case
         if (searchResults.length === 0) {
