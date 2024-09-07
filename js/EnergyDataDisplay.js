@@ -42,8 +42,10 @@ export class EnergyDataDisplay {
         this.#productionContainer.classList.add('hidden')
         this.#searchSortControls.classList.remove('hidden')
 
-        this.#searchQuery = this.#searchInput.value
-        this.#searchInput.value = ''
+        if (event) {
+            this.#searchQuery = this.#searchInput.value
+            this.#searchInput.value = ''  
+        }
         const url = `https://cscloud7-30.lnu.se/wt2/api/search?page=${this.#currentPage}&limit=25`
         const searchQuery = {
             query: this.#searchQuery 
@@ -113,19 +115,19 @@ export class EnergyDataDisplay {
         previousButton.textContent = 'Previous Page'
 
         previousButton.disabled = this.#currentPage === 1
-        previousButton.addEventListener('click', (event) => {
+        previousButton.addEventListener('click', () => {
             if (this.#currentPage < this.#totalPages) {
                 this.#currentPage = this.#currentPage - 1
-                this.#fetchEnergyData(event)
+                this.#fetchEnergyData(null)
             }
         })
 
 
         nextButton.disabled = this.#currentPage === this.#totalPages
-        nextButton.addEventListener('click', (event) => {
+        nextButton.addEventListener('click', () => {
             if (this.#currentPage < this.#totalPages) {
                 this.#currentPage = this.#currentPage + 1
-                this.#fetchEnergyData(event)
+                this.#fetchEnergyData(null)
             }
         })
 
