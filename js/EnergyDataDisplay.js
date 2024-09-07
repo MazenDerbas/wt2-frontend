@@ -44,7 +44,7 @@ export class EnergyDataDisplay {
 
         this.#searchQuery = this.#searchInput.value
         this.#searchInput.value = ''
-        const url = `http://localhost:8080/api/search?page=${this.#currentPage}&limit=25`
+        const url = `https://cscloud7-30.lnu.se/wt2/api/search?page=${this.#currentPage}&limit=25`
         const searchQuery = {
             query: this.#searchQuery 
         }
