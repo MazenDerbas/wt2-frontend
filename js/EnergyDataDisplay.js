@@ -59,7 +59,7 @@ export class EnergyDataDisplay {
         })
         const data = await response.json()
 
-        
+        console.log('API Response:', data)
 
         const { searchResults, currentPage, totalPages } = data
         
