@@ -29,30 +29,33 @@ export class EnergyDataDisplay {
         this.#searchQuery = ''
 
 
-
+        // Bind event listeners
         this.#searchForm.addEventListener('submit', (event) => this.#fetchEnergyData(event))
         this.#sortBtn.addEventListener('click', () => this.#sortData())
     }
 
-
     async #fetchEnergyData(event) {
-        event.preventDefault()
+        // Prevent default form submission behavior only when there is an event
+        if (event) event.preventDefault();
 
         this.#consumptionContainer.classList.add('hidden')
         this.#productionContainer.classList.add('hidden')
         this.#searchSortControls.classList.remove('hidden')
 
+        // Update search query if triggered by form submit
         if (event) {
             this.#searchQuery = this.#searchInput.value
             this.#searchInput.value = ''  
         }
+
+        // API URL and payload
         const url = `https://cscloud7-30.lnu.se/wt2/api/search?page=${this.#currentPage}&limit=25`
         const searchQuery = {
             query: this.#searchQuery 
         }
 
-        
-        const response = await fetch (url, {
+        // Fetch data from API
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -64,30 +67,33 @@ export class EnergyDataDisplay {
         console.log('API Response:', data)
 
         const { searchResults, currentPage, totalPages } = data
-        
+
+        // Handle no results case
         if (searchResults.length === 0) {
             const noDataMessage = document.createElement('p')
-            noDataMessage.textContent = 'No results found for the given country. Available countires are : France, China, India, Japan, Australia, Russia, Brazil, Germany, USA, Canada'
+            noDataMessage.textContent = 'No results found for the given country. Available countries are: France, China, India, Japan, Australia, Russia, Brazil, Germany, USA, Canada'
             noDataMessage.id = 'no-data-message'
             noDataMessage.style.color = 'red'
             this.#searchTable.parentNode.insertBefore(noDataMessage, this.#searchTable)
             this.#searchTable.classList.add('hidden')
-        } 
+        }
 
+        // Update current page and total pages
         this.#currentPage = currentPage
         this.#totalPages = totalPages
+
+        // Render data and pagination controls
         this.#renderEnergyData(searchResults)
         this.#renderPagingsbuttons()
     }
 
     #renderEnergyData(data) {
-
         const tbody = this.#searchTable.querySelector('tbody')
-        tbody.textContent = '' 
+        tbody.textContent = '' // Clear previous results
 
+        // Render each result as a row in the table
         data.forEach(item => {
             const row = document.createElement('tr')
-
             row.innerHTML = `
                 <td>${item.country || 'N/A'}</td>
                 <td>${item.year || 'N/A'}</td>
@@ -98,7 +104,6 @@ export class EnergyDataDisplay {
                 <td>${item.electricityImports || 'N/A'} GWh</td>
                 <td>${item.co2Emissions || 'N/A'} Mt</td>
             `
-
             tbody.appendChild(row)
         })
 
@@ -109,41 +114,41 @@ export class EnergyDataDisplay {
     #renderPagingsbuttons() {
         const nextButton = document.createElement('button')
         const previousButton = document.createElement('button')
-        this.#pagination.innerHTML= ''
+        this.#pagination.innerHTML = '' // Clear previous buttons
 
-        nextButton.textContent= 'Next page'
+        nextButton.textContent = 'Next page'
         previousButton.textContent = 'Previous Page'
 
+        // Handle "Previous" button
         previousButton.disabled = this.#currentPage === 1
         previousButton.addEventListener('click', () => {
-            if (this.#currentPage < this.#totalPages) {
-                this.#currentPage = this.#currentPage - 1
-                this.#fetchEnergyData(null)
+            if (this.#currentPage > 1) {
+                this.#currentPage -= 1
+                this.#fetchEnergyData(null) // Passing null since no event is needed
             }
         })
 
-
+        // Handle "Next" button
         nextButton.disabled = this.#currentPage === this.#totalPages
         nextButton.addEventListener('click', () => {
             if (this.#currentPage < this.#totalPages) {
-                this.#currentPage = this.#currentPage + 1
-                this.#fetchEnergyData(null)
+                this.#currentPage += 1
+                this.#fetchEnergyData(null) // Passing null since no event is needed
             }
         })
 
-        
-
+        // Append buttons to pagination container
         this.#pagination.appendChild(previousButton)
         this.#pagination.appendChild(nextButton)
     }
 
     async #sortData() {
         const url = `https://cscloud7-30.lnu.se/wt2/api/search?page=${this.#currentPage}&limit=25&sortField=${this.#sortField.value}&sortOrder=${this.#sortOrder.value}`
-        
         const searchQuery = {
             query: this.#searchQuery
         }
 
+        // Fetch sorted data from API
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -155,8 +160,11 @@ export class EnergyDataDisplay {
         const data = await response.json()
         const { searchResults, currentPage, totalPages } = data
 
+        // Update current page and total pages after sorting
         this.#currentPage = currentPage
         this.#totalPages = totalPages
+
+        // Render sorted data and update pagination
         this.#renderEnergyData(searchResults)
         this.#renderPagingsbuttons()
     }
